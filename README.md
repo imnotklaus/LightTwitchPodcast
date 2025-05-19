@@ -5,7 +5,9 @@ fork of [TwitchToPodcastRSS](https://github.com/lzeke0/TwitchRSS)
 converts a twitch channel in a full-blown podcast that you can use on your Light Phone ii or Light Phone iii's podcast tool
 (you can use this with a normal podcast app on a smartphone too)
 
-<img width="500" padding="8px" alt="Screenshot 2025-05-18 at 6 47 52 PM" src="https://github.com/user-attachments/assets/fc99bc9d-fd9c-49f4-b858-42b9242430aa" />
+<img width="500" align="left" padding="8px" alt="Screenshot 2025-05-18 at 6 47 52 PM" src="https://github.com/user-attachments/assets/fc99bc9d-fd9c-49f4-b858-42b9242430aa" />
+<img width="212" padding="8px" alt="Screenshot_20250518-143437_png" src="https://github.com/user-attachments/assets/ad8e6cec-66ff-4308-aafd-d4fda652dc32" />
+
 
 ## Usage
 
@@ -23,7 +25,8 @@ example: `myserver.com/vod/channelName?transcode=True`
 ### show currently streaming
 unfinished streams are not included, but if you want them to just add `?include_streaming=True` to the feed URL
 
-example: `myserver.com/vod/channelName?include_streaming=True`
+example: `myserver.com/![Screenshot_20250518-143437_png](https://github.com/user-attachments/assets/3543c924-629d-4863-ac70-fbefdd74b0fe)
+vod/channelName?include_streaming=True`
 
 ### sorting
 you can order the feed by any field suppored by twitch, the list of fields to sort by can be found [here](https://dev.twitch.tv/docs/api/reference#get-videos) in the response field section
