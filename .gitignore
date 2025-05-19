@@ -106,3 +106,4 @@ tags
 */debug.sh
 twitchToPodcast.code-workspace
 .vscode/launch.json
+.env
