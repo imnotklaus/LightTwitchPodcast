@@ -1,21 +1,23 @@
-version: '3.3'
 services:
     TwitchToPodcastRSS:
         build:
-            context: https://github.com/madiele/TwitchToPodcastRSS.git
+            context: https://github.com/imnotklaus/TwitchToPodcastRSS.git
         image: madiele/twitch_to_podcast_rss
         restart: unless-stopped
         container_name: twitchToPodcastRSS
         ports:
-            - '<PORT>:80'
+            - '80:80'
         environment:
-            - TZ=Europe/London
-            - TWITCH_SECRET=<YOUR_SECRET>
-            - TWITCH_CLIENT_ID=<YOUR_CLIENT_ID>
+            - TZ=US/Pacific
+            - TWITCH_SECRET=${TWITCH_SECRET}
+            - TWITCH_CLIENT_ID=${TWITCH_CLIENT_ID}
             - TRANSCODE=True
             #- TRANSCODE_SECONDS_BUFFER=120 #optional
             #- TRANSCODE_BANDWITH_kbps=1000 #optional your max upload bandwith
             #- TRANSCODE_BITRATE=128000 # encodes to 128k mp3 #optional
-            #- SERVER_NAME=myserver.com:80 #optional
+            - SERVER_NAME=rss.gayfrog.xyz #optional
             #- SUB_FOLDER=/ttprss #optional
             #- DEBUG=1 #optional
+        volumes:
+            - ./TwitchRSS/templates/index.html:/TwitchRSS/templates/index.html
+

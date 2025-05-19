@@ -1,20 +1,459 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Twitch stream RSS generator</title>
-    </head>
-    <body>
-        <p>
-            Twitch stream  to podcast RSS generator
-        </p>
-        <p>
-            You can get RSS of broadcasts by subscribing to https://twitchrss.appspot.com/vod/&lt;channel name&gt;<br>
-	    <br>
-        </p>
-	<p>
-		<input type="text" placeholder="channel name here" name="" id="vod" value="">
-		<input type="button" value="generate feed" onclick="getElementById(&quot;link&quot;).href = &quot;vod/&quot; + getElementById(&quot;vod&quot;).value; getElementById(&quot;link&quot;).innerHTML = location.host + &quot;/vod/&quot; + getElementById(&quot;vod&quot;).value">
-		<br>
-		<a href="" id="link"></a>
-	</p>
-    </body>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Twitch RSS Podcastifier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0e0e10;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #9146FF;
+      margin-bottom: 12px;
+    }
+
+    p.description {
+      font-size: 1rem;
+      color: #ffffff;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    span.bold-purple {
+      font-weight: bold;
+      color: #9146FF;
+    }
+    span.bold-pastel-purple {
+      font-weight: bold;
+      color: #bc91fe;
+      line-height: 1.8;
+    }
+    span.off-white {
+      font-weight: normal;
+      color: #eaeaea;
+      line-height: 1.8;
+
+    }
+
+    .input-group {
+      display: flex;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #333;
+      margin-bottom: 12px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #1f1f23;
+      color: #fff;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      background-color: #9146FF;
+      color: white;
+      border: none;
+      padding: 0 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-radius: 0;
+    }
+
+    button:hover {
+      background-color: #772ce8;
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      margin-top: 18px;
+      gap: 6px;
+      user-select: none;
+    }
+
+    .checkbox input[type="checkbox"] {
+      accent-color: #9146FF;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* Modal backdrop */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(14,14,16,0.85);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    /* Modal content */
+    .modal-content {
+  position: relative; /* Needed for absolutely positioned children */
+  background-color: #1f1f23;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 0 15px #9146FF;
+  text-align: center;
+  color: #fff;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px;
+  height: 220px;
+}
+
+.modal-message {
+  font-size: 1.75rem;
+  margin: 0 0 4px 0; /* much smaller bottom margin */
+  color: #bc91fe; /* pastel Twitch purple */
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.modal-buttons a {
+  color: white;
+  padding: 12px 28px;
+  border-radius: 24px;
+  font-weight: 600;
+  font-size: .9rem;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  min-width: 140px;
+  text-align: center;
+  box-shadow: none; /* remove glow */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.modal-buttons a:hover {
+  background-color: #9146FF;
+  color: white;
+  border-color: #9146FF;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+
+}
+
+.button1 a {
+    display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-grow: 0;
+  flex-shrink: 0;
+    background-color: #9046ff71;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: .9rem;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    min-width: 140px;
+    text-align: center;
+    box-shadow: none; /* remove glow */
+    border: 1.5px solid #ffffff23;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.button1 a:hover {
+  background-color: #9146FF;
+  color: white;
+  border-color: #9146FF;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.button2 a {
+    display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-grow: 0;
+  flex-shrink: 0;
+    background-color: #2a2a2f;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: .9rem;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    min-width: 140px;
+    text-align: center;
+    box-shadow: none; /* remove glow */
+    border: 1.5px solid #9046ff71;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.button2 a:hover {
+  background-color: #9146FF;
+  color: white;
+  border-color: #9146FF;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Close button inside modal */
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #9046ff83;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  color: #e3d5f9; /* soft pastel purple */
+  background: none;
+}
+
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .input-group {
+        flex-direction: column;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      input[type="text"] {
+        border-bottom: 1px solid #333;
+      }
+
+      button {
+        background-color: #a970ff;
+        color: white;
+        border: none;
+        padding: 0 24px;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+      }
+
+      button:hover {
+        background-color: #b88dff;
+        transform: translateX(2px);
+      }
+
+      .modal-content {
+        max-width: 95%;
+        padding: 20px 24px;
+        height: auto; /* allow flexible height on small screens */
+      }
+
+      .modal-buttons a {
+        min-width: 120px;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="pageContent">
+    <h1>Twitch RSS Podcastifier</h1>
+    <p class="description">
+      Generate a podcast RSS feed of a <span class="bold-purple">Twitch</span> channel's VODs.
+    </p>
+    <form id="feedForm" class="input-group" onsubmit="generateFeed(event)">
+      <input type="text" id="vod" placeholder="Twitch channel name" autocomplete="off" />
+      <button type="submit" id="generateBtn" aria-label="Generate RSS Feed">→</button>
+    </form>     
+    <div class="checkbox">
+      <input type="checkbox" id="excludeStream" />
+      <label for="excludeStream">Exclude active livestreams</label>
+    </div>
+  </div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+    <div class="modal-content" role="document">
+      <button class="modal-close-btn" id="closeModal" aria-label="Close modal">✕</button>
+      <p class="modal-message" id="modalTitle">Link copied!</p>
+        <p><strong>IMPORTANT:</strong> must sift RSS for Light's podcast tool: <br>
+            <strong><span class="bold-pastel-purple">"include"</span></strong><span class="off-white"> items where the </span><strong><span class="bold-pastel-purple">"title"</span><span class="off-white"> is </span><span class="bold-pastel-purple">"exists"</span></strong></p>
+        
+    <div class="modal-buttons">
+        <div class="button1">
+            <a href="https://siftrss.com/" target="_blank" rel="noopener noreferrer" id="lightDashboardBtn">Sift RSS for LightOS</a>
+             </div>
+        <div class="button2">
+            <a href="#" target="_blank" rel="noopener noreferrer" id="viewRssBtn">View RSS</a>
+             </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  
+
+  <script>
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const viewRssBtn = document.getElementById('viewRssBtn');
+    const closeModalBtn = document.getElementById('closeModal'); // 👈 Add this line
+  
+    function generateFeed(event) {
+      if(event) event.preventDefault();  // prevent form submission reload
+  
+      const vodInput = document.getElementById("vod");
+      const excludeStream = document.getElementById("excludeStream");
+      const channel = vodInput.value.trim();
+  
+      if (!channel) {
+        alert("Please enter a Twitch channel name.");
+        return;
+      }
+  
+      let feedUrl = `/vod/${channel}`;
+      if (!excludeStream.checked) {
+        feedUrl += `?include_streaming=True`;
+      } else {
+        feedUrl += `?include_streaming=False`;
+      }
+  
+      const fullUrl = `${window.location.origin}${feedUrl}`;
+  
+      // Copy to clipboard and show modal
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        // Update RSS button href
+        viewRssBtn.href = fullUrl;
+  
+        // Show modal
+        modalBackdrop.classList.add('active');
+  
+        // Trap focus inside modal for accessibility
+        trapFocus(modalBackdrop);
+      }).catch(() => {
+        alert('Failed to copy link to clipboard.');
+      });
+    }
+  
+    // Close modal when click outside modal content
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) {
+        closeModal();
+      }
+    });
+  
+    // Close modal on esc key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modalBackdrop.classList.contains('active')) {
+        closeModal();
+      }
+    });
+  // Close modal on X button click
+    closeModalBtn.addEventListener('click', closeModal);
+  
+    function closeModal() {
+      modalBackdrop.classList.remove('active');
+      releaseFocusTrap();
+      // Return focus to generate button
+      document.getElementById('vod').focus();
+    }
+  
+    // Accessibility: trap focus inside modal when open
+    let focusableElements = [];
+    let firstFocusable = null;
+    let lastFocusable = null;
+    let focusTrapActive = false;
+  
+    function trapFocus(element) {
+      if (focusTrapActive) return;
+      focusTrapActive = true;
+  
+      focusableElements = element.querySelectorAll('a, button, input, [tabindex]:not([tabindex="-1"])');
+      if (focusableElements.length === 0) return;
+  
+      firstFocusable = focusableElements[0];
+      lastFocusable = focusableElements[focusableElements.length - 1];
+  
+      firstFocusable.focus();
+  
+      element.addEventListener('keydown', handleFocusTrap);
+    }
+  
+    function releaseFocusTrap() {
+      focusTrapActive = false;
+      modalBackdrop.removeEventListener('keydown', handleFocusTrap);
+    }
+  
+    function handleFocusTrap(e) {
+      if (e.key !== 'Tab') return;
+  
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          e.preventDefault();
+          lastFocusable.focus();
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          e.preventDefault();
+          firstFocusable.focus();
+        }
+      }
+    }
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+
+  </script>  
+</body>
 </html>

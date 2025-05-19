@@ -9,3 +9,4 @@ lxml==4.7.1
 pycryptodome==3.14.1
 gunicorn==20.1.0
 m3u8==1.0.0
+Werkzeug<2.1.0
